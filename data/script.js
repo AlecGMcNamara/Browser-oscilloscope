@@ -6,8 +6,7 @@ const yaxisRef = 325;
 const xaxisMultiplier = 50;
 const yaxisMultiplier = 5;
 
-var JSONReceived =
-    
+var JSONReceived =   
         {axis1 : [
             {"time": 0 ,"reading": 0} ,
             {"time": 8,"reading": 5} ,
@@ -23,17 +22,11 @@ var JSONReceived =
 window.addEventListener('load', onload);
 function onload(event) {
     DrawLegend("10ms / Div","1.0v / Div");
-
-    for(dbg=0 ;dbg<JSONReceived.axis1.length; dbg++)
-    {
-        console.log(JSONReceived.axis1[dbg].time);
-        console.log(JSONReceived.axis1[dbg].reading);    
-    }
-    console.log(JSONReceived.length);
 }
-setInterval(draw,100); //100msec test
 
-function draw(color)
+setInterval(DrawGraph,100); //100msec test
+
+function DrawGraph(color)
 {
     ctx.clearRect(gridborder, gridborder, canvas.width - 
         (gridborder * 2), canvas.height - (gridborder*2));
@@ -75,7 +68,7 @@ function draw(color)
          
     ctx.stroke(); // Draw it
 }
-function DrawLegend(hText,vText)
+function DrawLegend(hText,vText) //once only
 {
     ctx.font = "16px Arial";
     ctx.fillText(hText, (canvas.width - ctx.measureText(hText).width) / 2, canvas.height -5);
