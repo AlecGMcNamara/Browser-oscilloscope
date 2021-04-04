@@ -22,6 +22,7 @@ var JSONReceived =
 window.addEventListener('load', onload);
 function onload(event) {
     DrawLegend("10ms / Div","1.0v / Div");
+    console.log(JSON.stringify(JSONReceived));
 }
 
 setInterval(DrawGraph,100); //100msec test
