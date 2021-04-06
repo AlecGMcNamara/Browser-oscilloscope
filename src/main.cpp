@@ -20,12 +20,12 @@ void ICACHE_RAM_ATTR myISR()
 {
   cli(); //disable interupts
   if(!Triggered){
-    Triggered = true;
     TriggerTime = millis();
     doc.clear();
     Readings = doc.createNestedArray("Reading");
+    Triggered = true;
   }
-  Readings.add(millis());
+  Readings.add(millis()-TriggerTime);
   Readings.add(digitalRead(CLK));
   sei(); //enable interupts
 }
@@ -45,7 +45,7 @@ void loop()
     serializeJson(doc, output);
     Serial.print(output);
     //display last reading, because I can :)
-    Serial.println((unsigned) Readings[Readings.size()-1]);
+    //Serial.println((unsigned) Readings[Readings.size()-1]);
     Triggered = false;
     }  
 }
