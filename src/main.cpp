@@ -14,7 +14,7 @@
 //volatile int intCount = MIN_COUNT;
 volatile bool Triggered = false;
 unsigned long TriggerTime = 0;
-StaticJsonDocument <200> jsonWrite;
+
 
 void ICACHE_RAM_ATTR myISR()
 {
@@ -23,6 +23,9 @@ void ICACHE_RAM_ATTR myISR()
     Triggered = true;
     TriggerTime = millis();
   }
+    Serial.print(millis()); Serial.print(":"); 
+    Serial.print(digitalRead(CLK)); Serial.print(";");
+   
 
   sei(); //enable interupts
 }
@@ -39,7 +42,7 @@ void loop()
 {
   if(Triggered && TriggerTime+100 < millis()){
     Triggered = false;
-    Serial.println("Finished");
+    Serial.println();
   }  
 
 
