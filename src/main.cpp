@@ -6,15 +6,15 @@
   3v3      Vcc
   Gnd      Gnd
   D2       CLK
-  D3       DT
-  Tested on D0,D1 and D6,D7 
-  All GPIO can be used except D16  */
+*/  
 
 #define CLK D2
-//volatile int intCount = MIN_COUNT;
+#define BUFFER_SIZE 100
 volatile bool Triggered = false;
 unsigned long TriggerTime = 0;
 
+StaticJsonDocument <500> doc;
+JsonArray Readings; 
 
 void ICACHE_RAM_ATTR myISR()
 {
@@ -22,11 +22,11 @@ void ICACHE_RAM_ATTR myISR()
   if(!Triggered){
     Triggered = true;
     TriggerTime = millis();
+    doc.clear();
+    Readings = doc.createNestedArray("Reading");
   }
-    Serial.print(millis()); Serial.print(":"); 
-    Serial.print(digitalRead(CLK)); Serial.print(";");
-   
-
+  Readings.add(millis());
+  Readings.add(digitalRead(CLK));
   sei(); //enable interupts
 }
 
@@ -41,9 +41,11 @@ void setup()
 void loop()
 {
   if(Triggered && TriggerTime+100 < millis()){
+    String output;
+    serializeJson(doc, output);
+    Serial.print(output);
+    //display last reading, because I can :)
+    Serial.println((unsigned) Readings[Readings.size()-1]);
     Triggered = false;
-    Serial.println();
-  }  
-
-
+    }  
 }
