@@ -1,33 +1,45 @@
+var gateway = `ws://${window.location.hostname}/ws`;
+var websocket;
+
+window.addEventListener('load', onload);
+function onload(event) {
+    initWebSocket();
+    DrawLegend("10ms / Div","1.0v / Div");
+}
+function initWebSocket() {
+    console.log('Trying to open a WebSocket connection…');
+    websocket = new WebSocket(gateway);
+    websocket.onopen = onOpen;
+    websocket.onclose = onClose;
+    websocket.onmessage = onMessage;
+}
+function onOpen(event) {
+    console.log('Connection opened');
+    websocket.send('hi');
+}
+function onClose(event) {
+    console.log('Connection closed');
+    setTimeout(initWebSocket, 2000);
+}
+function onMessage(event) {
+    jsonReadings = JSON.parse(event.data);
+    console.log(jsonReadings);
+    DrawGraph();
+}
+
 const canvas = document.getElementById("Axis1Canvas");
 const ctx = canvas.getContext("2d");
 const gridborder = 25;
 const gridspacing = 50;
 const yaxisRef = 325;
-const xaxisMultiplier = 50;
+const xaxisMultiplier = 250;
 const yaxisMultiplier = 5;
 
-var JSONReceived =   
-        {axis1 : [
-            {"time": 0 ,"reading": 0} ,
-            {"time": 8,"reading": 5} ,
-            {"time": 20 ,"reading": 0} ,
-            {"time": 35 ,"reading": 5} ,
-            {"time": 52 ,"reading": 0} ,
-            {"time": 62 ,"reading": 5} ,
-            {"time": 78 ,"reading": 0} ,
-            {"time": 85 ,"reading": 5} ,
-            {"time": 110 ,"reading": 0 } ]
-        };
+var jsonReadings;
 
-window.addEventListener('load', onload);
-function onload(event) {
-    DrawLegend("10ms / Div","1.0v / Div");
-    console.log(JSON.stringify(JSONReceived));
-}
+//setInterval(DrawGraph,100); //100msec test
 
-setInterval(DrawGraph,100); //100msec test
-
-function DrawGraph(color)
+function DrawGraph()
 {
     ctx.clearRect(gridborder, gridborder, canvas.width - 
         (gridborder * 2), canvas.height - (gridborder*2));
@@ -56,17 +68,22 @@ function DrawGraph(color)
     ctx.strokeStyle = "green";
 
     //startposition
-    ctx.moveTo(JSONReceived.axis1[0].time * yaxisMultiplier + gridborder,
-        yaxisRef - JSONReceived.axis1[0].reading * xaxisMultiplier);
-    for(drw=1 ;drw<JSONReceived.axis1.length; drw++)
-    {
-        ctx.lineTo(JSONReceived.axis1[drw].time * yaxisMultiplier + gridborder,
-            yaxisRef - JSONReceived.axis1[drw-1].reading * xaxisMultiplier);
 
-        ctx.lineTo(JSONReceived.axis1[drw].time * yaxisMultiplier + gridborder, 
-            yaxisRef - JSONReceived.axis1[drw].reading * xaxisMultiplier);   
+    
+    ctx.moveTo(jsonReadings["Reading"][0] * yaxisMultiplier + gridborder+1,
+        yaxisRef - jsonReadings["Reading"][1] * xaxisMultiplier);
+    
+    for(drw=2 ;drw<jsonReadings["Reading"].length; drw+=2)
+    {
+        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1,
+            yaxisRef - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
+
+        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1, 
+            yaxisRef - jsonReadings["Reading"][drw+1] * xaxisMultiplier);   
     }
-         
+    ctx.lineTo(canvas.width - gridborder, 
+            yaxisRef - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
+
     ctx.stroke(); // Draw it
 }
 function DrawLegend(hText,vText) //once only
