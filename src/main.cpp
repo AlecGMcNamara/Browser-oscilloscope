@@ -19,6 +19,7 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
 #define CLK D2
+#define DT D3
 #define BUFFER_SIZE 100
 volatile bool Triggered = false;
 unsigned long TriggerTime = 0;
@@ -50,8 +51,6 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
  switch (type) {
     case WS_EVT_CONNECT:
       Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
-      //force server to send current status to browser
-      //JsonLastMessageSent="";
       break;
     case WS_EVT_DISCONNECT:
       Serial.printf("WebSocket client #%u disconnected\n", client->id());
@@ -69,10 +68,10 @@ void initWebSocket() {
   server.addHandler(&ws);
 }
 
-StaticJsonDocument <500> doc;
+StaticJsonDocument <1000> doc;
 JsonArray Readings; 
 
-void ICACHE_RAM_ATTR myISR()
+void ICACHE_RAM_ATTR D2ISR()
 {
   cli(); //disable interupts
   if(!Triggered){
@@ -83,21 +82,32 @@ void ICACHE_RAM_ATTR myISR()
   }
   Readings.add(millis()-TriggerTime);
   Readings.add(digitalRead(CLK));
+  Readings.add(digitalRead(DT));
   sei(); //enable interupts
 }
 
-void initFS() {
-  if (!LittleFS.begin()) {
-    Serial.println("An error has occurred while mounting LittleFS");   }
-  Serial.println("LittleFS mounted successfully");
+void ICACHE_RAM_ATTR D3ISR()
+{
+  cli(); //disable interupts
+  if(!Triggered){
+    TriggerTime = millis();
+    doc.clear();
+    Readings = doc.createNestedArray("Reading");
+    Triggered = true;
+  }
+  Readings.add(millis()-TriggerTime);
+  Readings.add(digitalRead(CLK));
+  Readings.add(digitalRead(DT));
+  sei(); //enable interupts
 }
+
 void setup()
 {
   Serial.begin(115200);
   Serial.println();
   pinMode(CLK, INPUT);
 
-  initFS();
+  LittleFS.begin();
   initWiFi();
   initWebSocket();
   
@@ -106,8 +116,8 @@ void setup()
   server.serveStatic("/", LittleFS, "/");
  // Start server
   server.begin();
-
-  attachInterrupt(digitalPinToInterrupt(CLK), myISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(CLK), D2ISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(DT), D3ISR, CHANGE);
 }
 
 void loop()
@@ -116,9 +126,6 @@ void loop()
     String output;
     serializeJson(doc, output);
     notifyClients(output);
-    //Serial.println(output);
-    //display last reading, because I can :)
-    //Serial.println((unsigned) Readings[Readings.size()-1]);
     Triggered = false;
     }  
 }

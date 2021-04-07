@@ -4,7 +4,7 @@ var websocket;
 window.addEventListener('load', onload);
 function onload(event) {
     initWebSocket();
-    DrawLegend("10ms / Div","1.0v / Div");
+    DrawLegend("10ms / Div","Digital Signals");
 }
 function initWebSocket() {
     console.log('Trying to open a WebSocket connection…');
@@ -30,9 +30,9 @@ function onMessage(event) {
 const canvas = document.getElementById("Axis1Canvas");
 const ctx = canvas.getContext("2d");
 const gridborder = 25;
-const gridspacing = 50;
-const yaxisRef = 325;
-const xaxisMultiplier = 250;
+const gridspacing = 50; 
+yaxisRef = 325;
+const xaxisMultiplier = 100;
 const yaxisMultiplier = 5;
 
 var jsonReadings;
@@ -64,31 +64,58 @@ function DrawGridlines()
 function DrawGraph()
 {
     DrawGridlines();
-
     // draw readings
     ctx.beginPath();
     ctx.lineWidth = "2";
     ctx.strokeStyle = "green";
-
+    yaxisRef = 325;
     //startposition
-
-    
-    ctx.moveTo(jsonReadings["Reading"][0] * yaxisMultiplier + gridborder+1,
+      ctx.moveTo(jsonReadings["Reading"][0] * yaxisMultiplier + gridborder+1,
         yaxisRef - jsonReadings["Reading"][1] * xaxisMultiplier);
     
-    for(drw=2 ;drw<jsonReadings["Reading"].length; drw+=2)
+    for(drw=3 ;drw<jsonReadings["Reading"].length; drw+=3)
+    {
+        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1,
+            yaxisRef - jsonReadings["Reading"][drw-2] * xaxisMultiplier);
+
+        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1, 
+            yaxisRef - jsonReadings["Reading"][drw+1] * xaxisMultiplier);   
+    }
+    //run to end
+    ctx.lineTo(canvas.width - gridborder, 
+            yaxisRef - jsonReadings["Reading"][drw-2] * xaxisMultiplier);
+
+    ctx.stroke(); // Draw it
+    DrawGraph2();
+}
+
+function DrawGraph2()
+{
+    // draw readings
+    ctx.beginPath();
+    ctx.lineWidth = "2";
+    ctx.strokeStyle = "red";
+    yaxisRef = 175;
+    //startposition
+      ctx.moveTo(jsonReadings["Reading"][0] * yaxisMultiplier + gridborder+1,
+        yaxisRef - jsonReadings["Reading"][2] * xaxisMultiplier);
+    
+    for(drw=3 ;drw<jsonReadings["Reading"].length; drw+=3)
     {
         ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1,
             yaxisRef - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
 
         ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1, 
-            yaxisRef - jsonReadings["Reading"][drw+1] * xaxisMultiplier);   
+            yaxisRef - jsonReadings["Reading"][drw+2] * xaxisMultiplier);   
     }
+    //run to end
     ctx.lineTo(canvas.width - gridborder, 
             yaxisRef - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
 
     ctx.stroke(); // Draw it
 }
+
+
 function DrawLegend(hText,vText) //once only
 {
     ctx.font = "16px Arial";
