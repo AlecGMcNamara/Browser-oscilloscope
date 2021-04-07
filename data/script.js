@@ -38,8 +38,7 @@ const yaxisMultiplier = 5;
 var jsonReadings;
 
 //setInterval(DrawGraph,100); //100msec test
-
-function DrawGraph()
+function DrawGridlines()
 {
     ctx.clearRect(gridborder, gridborder, canvas.width - 
         (gridborder * 2), canvas.height - (gridborder*2));
@@ -61,6 +60,10 @@ function DrawGraph()
         ctx.lineTo(gl,canvas.height - gridborder);
     }
     ctx.stroke();
+}
+function DrawGraph()
+{
+    DrawGridlines();
 
     // draw readings
     ctx.beginPath();
@@ -95,5 +98,6 @@ function DrawLegend(hText,vText) //once only
     ctx.rotate( 3 * Math.PI / 2 );
     ctx.fillText(vText, (canvas.height + ctx.measureText(vText).width) / 2 * -1 , 15 - canvas.width );
     ctx.restore();
+    DrawGridlines();
 }
     
