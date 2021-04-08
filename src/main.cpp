@@ -19,9 +19,12 @@ const char* ssid = "SKYPEMHG";
 const char* password = "8NHetSWQAJ75";
 volatile bool Triggered = false;
 volatile unsigned long TriggerTime = 0;
+volatile bool lastTriggerPulse = true;
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
+StaticJsonDocument <2000> jsonDoc;
+JsonArray Readings; 
 
 // Initialize WiFi
 void initWiFi() {
@@ -63,43 +66,30 @@ void initWebSocket() {
   server.addHandler(&ws);
 }
 
-StaticJsonDocument <2000> jsonDoc;
-JsonArray Readings; 
-
-void ICACHE_RAM_ATTR D2ISR()
+void ICACHE_RAM_ATTR myISR()
 {
   cli(); //disable interupts
-  if(!Triggered){
-    TriggerTime = millis();
+  bool tCLK = digitalRead(CLK);
+  bool tDT = digitalRead(DT);
+  unsigned long tMillis = millis();
+
+  if(!Triggered && lastTriggerPulse && !tCLK){  //wait for falling edge on CLK pulse 
+    TriggerTime = tMillis;
     jsonDoc.clear();
     Readings = jsonDoc.createNestedArray("Reading");
     Triggered = true;
   }
-  Readings.add(millis()-TriggerTime);
-  Readings.add(digitalRead(CLK));
-  Readings.add(digitalRead(DT));
-  sei(); //enable interupts
-}
-
-void ICACHE_RAM_ATTR D3ISR()
-{
-  cli(); //disable interupts
-  if(!Triggered){
-    TriggerTime = millis();
-    jsonDoc.clear();
-    Readings = jsonDoc.createNestedArray("Reading");
-    Triggered = true;
-  }
-  Readings.add(millis()-TriggerTime);
-  Readings.add(digitalRead(CLK));
-  Readings.add(digitalRead(DT));
+  Readings.add(tMillis-TriggerTime);
+  Readings.add(tCLK);
+  Readings.add(tDT);
+  lastTriggerPulse = tCLK;
   sei(); //enable interupts
 }
 
 void setup()
 {
   Serial.begin(115200);
-  Serial.println();
+  Serial.println("Starting...");
   pinMode(CLK, INPUT);
   pinMode(DT,INPUT);
   LittleFS.begin();
@@ -110,8 +100,8 @@ void setup()
     request->send(LittleFS, "/index.html", "text/html",false); });
   server.serveStatic("/", LittleFS, "/");
   server.begin();
-  attachInterrupt(digitalPinToInterrupt(CLK), D2ISR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(DT), D3ISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(CLK), myISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(DT), myISR, CHANGE);
 }
 
 void loop()
