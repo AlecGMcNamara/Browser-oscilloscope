@@ -92,11 +92,9 @@ void ICACHE_RAM_ATTR channel1ISR()
 void ICACHE_RAM_ATTR channel2ISR()
 {
   cli(); //disable interupts
-  bool tDT = digitalRead(DT);
-  unsigned long tMillis = millis();
   if(Triggered) {
-  Channel2.add(tMillis-TriggerTime);
-  Channel2.add(tDT);}
+    Channel2.add(millis() - TriggerTime);
+    Channel2.add(digitalRead(DT));}
   sei(); //enable interupts
 }
 
