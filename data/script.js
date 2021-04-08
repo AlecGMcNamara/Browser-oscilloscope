@@ -24,24 +24,24 @@ function onClose(event) {
 function onMessage(event) {
     jsonReadings = JSON.parse(event.data);
     console.log(jsonReadings);
-    DrawGraph();
+    DrawReadings();
 }
-
+// X -->     Y^
 const canvas = document.getElementById("Axis1Canvas");
 const ctx = canvas.getContext("2d");
 const gridborder = 25;
 const gridspacing = 50; 
-yaxisRef = 325;
-const xaxisMultiplier = 100;
-const yaxisMultiplier = 5;
+Reading1YaxisBaseLine = 325;
+Reading2YaxisBaseLine = 175;
+xaxisMultiplier = 100;
+yaxisMultiplier = 5;
 
 var jsonReadings;
 
 //setInterval(DrawGraph,100); //100msec test
 function DrawGridlines()
 {
-    ctx.clearRect(gridborder, gridborder, canvas.width - 
-        (gridborder * 2), canvas.height - (gridborder*2));
+    ctx.clearRect(gridborder, gridborder, canvas.width - gridborder, canvas.height - gridborder*2);
 
     //draw graph lines
     ctx.beginPath();
@@ -61,56 +61,52 @@ function DrawGridlines()
     }
     ctx.stroke();
 }
-function DrawGraph()
+function DrawReadings()
 {
     DrawGridlines();
-    // draw readings
+    // draw reading1
     ctx.beginPath();
     ctx.lineWidth = "2";
     ctx.strokeStyle = "green";
-    yaxisRef = 325;
+    
     //startposition
       ctx.moveTo(jsonReadings["Reading"][0] * yaxisMultiplier + gridborder+1,
-        yaxisRef - jsonReadings["Reading"][1] * xaxisMultiplier);
+        Reading1YaxisBaseLine - jsonReadings["Reading"][1] * xaxisMultiplier);
     
     for(drw=3 ;drw<jsonReadings["Reading"].length; drw+=3)
     {
         ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1,
-            yaxisRef - jsonReadings["Reading"][drw-2] * xaxisMultiplier);
+            Reading1YaxisBaseLine - jsonReadings["Reading"][drw-2] * xaxisMultiplier);
 
         ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1, 
-            yaxisRef - jsonReadings["Reading"][drw+1] * xaxisMultiplier);   
+            Reading1YaxisBaseLine - jsonReadings["Reading"][drw+1] * xaxisMultiplier);   
     }
     //run to end
     ctx.lineTo(canvas.width - gridborder, 
-            yaxisRef - jsonReadings["Reading"][drw-2] * xaxisMultiplier);
+            Reading1YaxisBaseLine - jsonReadings["Reading"][drw-2] * xaxisMultiplier);
 
     ctx.stroke(); // Draw it
-    DrawGraph2();
-}
 
-function DrawGraph2()
-{
-    // draw readings
+    // draw reading2
     ctx.beginPath();
     ctx.lineWidth = "2";
     ctx.strokeStyle = "red";
-    yaxisRef = 175;
+
     //startposition
       ctx.moveTo(jsonReadings["Reading"][0] * yaxisMultiplier + gridborder+1,
-        yaxisRef - jsonReadings["Reading"][2] * xaxisMultiplier);
+        Reading2YaxisBaseLine - jsonReadings["Reading"][2] * xaxisMultiplier);
     
     for(drw=3 ;drw<jsonReadings["Reading"].length; drw+=3)
     {
         ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1,
-            yaxisRef - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
+            Reading2YaxisBaseLine - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
 
         ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1, 
-            yaxisRef - jsonReadings["Reading"][drw+2] * xaxisMultiplier);   
+            Reading2YaxisBaseLine - jsonReadings["Reading"][drw+2] * xaxisMultiplier);   
     }
     //run to end
     ctx.lineTo(canvas.width - gridborder, 
-            yaxisRef - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
+            Reading2YaxisBaseLine - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
 
     ctx.stroke(); // Draw it
 }

@@ -10,19 +10,18 @@
   3v3      Vcc
   Gnd      Gnd
   D2       CLK
+  D3       DT
 */  
-
-const char* ssid = "SKYPEMHG";
-const char* password = "8NHetSWQAJ75";
-
-AsyncWebServer server(80);
-AsyncWebSocket ws("/ws");
 
 #define CLK D2
 #define DT D3
-#define BUFFER_SIZE 100
+const char* ssid = "SKYPEMHG";
+const char* password = "8NHetSWQAJ75";
 volatile bool Triggered = false;
-unsigned long TriggerTime = 0;
+volatile unsigned long TriggerTime = 0;
+
+AsyncWebServer server(80);
+AsyncWebSocket ws("/ws");
 
 // Initialize WiFi
 void initWiFi() {
@@ -34,10 +33,6 @@ void initWiFi() {
       delay(1000);  }
     Serial.println(WiFi.localIP());
 }
-void notifyClients(String state) {
-  ws.textAll(state);
-}
-
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) { 
@@ -68,7 +63,7 @@ void initWebSocket() {
   server.addHandler(&ws);
 }
 
-StaticJsonDocument <1000> doc;
+StaticJsonDocument <2000> jsonDoc;
 JsonArray Readings; 
 
 void ICACHE_RAM_ATTR D2ISR()
@@ -76,8 +71,8 @@ void ICACHE_RAM_ATTR D2ISR()
   cli(); //disable interupts
   if(!Triggered){
     TriggerTime = millis();
-    doc.clear();
-    Readings = doc.createNestedArray("Reading");
+    jsonDoc.clear();
+    Readings = jsonDoc.createNestedArray("Reading");
     Triggered = true;
   }
   Readings.add(millis()-TriggerTime);
@@ -91,8 +86,8 @@ void ICACHE_RAM_ATTR D3ISR()
   cli(); //disable interupts
   if(!Triggered){
     TriggerTime = millis();
-    doc.clear();
-    Readings = doc.createNestedArray("Reading");
+    jsonDoc.clear();
+    Readings = jsonDoc.createNestedArray("Reading");
     Triggered = true;
   }
   Readings.add(millis()-TriggerTime);
@@ -106,7 +101,7 @@ void setup()
   Serial.begin(115200);
   Serial.println();
   pinMode(CLK, INPUT);
-
+  pinMode(DT,INPUT);
   LittleFS.begin();
   initWiFi();
   initWebSocket();
@@ -114,7 +109,6 @@ void setup()
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/index.html", "text/html",false); });
   server.serveStatic("/", LittleFS, "/");
- // Start server
   server.begin();
   attachInterrupt(digitalPinToInterrupt(CLK), D2ISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(DT), D3ISR, CHANGE);
@@ -122,10 +116,13 @@ void setup()
 
 void loop()
 {
+  String strjsonDoc;  
   if(Triggered && TriggerTime+100 < millis()){
-    String output;
-    serializeJson(doc, output);
-    notifyClients(output);
+    serializeJson(jsonDoc, strjsonDoc);
+    if(ws.availableForWriteAll()) 
+    {
+        ws.textAll(strjsonDoc); 
+    }
     Triggered = false;
     }  
 }
