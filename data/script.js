@@ -70,20 +70,20 @@ function DrawReadings()
     ctx.strokeStyle = "green";
     
     //startposition
-      ctx.moveTo(jsonReadings["Reading"][0] * yaxisMultiplier + gridborder+1,
-        Reading1YaxisBaseLine - jsonReadings["Reading"][1] * xaxisMultiplier);
+      ctx.moveTo(jsonReadings["Channel1"][0] * yaxisMultiplier + gridborder+1,
+        Reading1YaxisBaseLine - jsonReadings["Channel1"][1] * xaxisMultiplier);
     
-    for(drw=3 ;drw<jsonReadings["Reading"].length; drw+=3)
+    for(drw=2 ;drw<jsonReadings["Channel1"].length; drw+=2)
     {
-        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1,
-            Reading1YaxisBaseLine - jsonReadings["Reading"][drw-2] * xaxisMultiplier);
+        ctx.lineTo(jsonReadings["Channel1"][drw] * yaxisMultiplier + gridborder+1,
+            Reading1YaxisBaseLine - jsonReadings["Channel1"][drw-1] * xaxisMultiplier);
 
-        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1, 
-            Reading1YaxisBaseLine - jsonReadings["Reading"][drw+1] * xaxisMultiplier);   
+        ctx.lineTo(jsonReadings["Channel1"][drw] * yaxisMultiplier + gridborder+1, 
+            Reading1YaxisBaseLine - jsonReadings["Channel1"][drw+1] * xaxisMultiplier);   
     }
     //run to end
     ctx.lineTo(canvas.width - gridborder, 
-            Reading1YaxisBaseLine - jsonReadings["Reading"][drw-2] * xaxisMultiplier);
+            Reading1YaxisBaseLine - jsonReadings["Channel1"][drw-1] * xaxisMultiplier);
 
     ctx.stroke(); // Draw it
 
@@ -93,20 +93,20 @@ function DrawReadings()
     ctx.strokeStyle = "red";
 
     //startposition
-      ctx.moveTo(jsonReadings["Reading"][0] * yaxisMultiplier + gridborder+1,
-        Reading2YaxisBaseLine - jsonReadings["Reading"][2] * xaxisMultiplier);
+      ctx.moveTo(jsonReadings["Channel2"][0] * yaxisMultiplier + gridborder+1,
+        Reading2YaxisBaseLine - jsonReadings["Channel2"][1] * xaxisMultiplier);
     
-    for(drw=3 ;drw<jsonReadings["Reading"].length; drw+=3)
+    for(drw=2 ;drw<jsonReadings["Channel2"].length; drw+=2)
     {
-        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1,
-            Reading2YaxisBaseLine - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
+        ctx.lineTo(jsonReadings["Channel2"][drw] * yaxisMultiplier + gridborder+1,
+            Reading2YaxisBaseLine - jsonReadings["Channel2"][drw-1] * xaxisMultiplier);
 
-        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1, 
-            Reading2YaxisBaseLine - jsonReadings["Reading"][drw+2] * xaxisMultiplier);   
+        ctx.lineTo(jsonReadings["Channel2"][drw] * yaxisMultiplier + gridborder+1, 
+            Reading2YaxisBaseLine - jsonReadings["Channel2"][drw+1] * xaxisMultiplier);   
     }
     //run to end
     ctx.lineTo(canvas.width - gridborder, 
-            Reading2YaxisBaseLine - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
+            Reading2YaxisBaseLine - jsonReadings["Channel2"][drw-1] * xaxisMultiplier);
 
     ctx.stroke(); // Draw it
 }
