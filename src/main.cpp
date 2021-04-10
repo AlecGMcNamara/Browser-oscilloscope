@@ -24,7 +24,8 @@ volatile bool lastTriggerPulse = true;
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 StaticJsonDocument <2000> jsonDoc;
-JsonArray Readings; 
+JsonArray Channel1;
+JsonArray Channel2; 
 
 // Initialize WiFi
 void initWiFi() {
@@ -66,7 +67,7 @@ void initWebSocket() {
   server.addHandler(&ws);
 }
 
-void ICACHE_RAM_ATTR myISR()
+void ICACHE_RAM_ATTR channel1ISR()
 {
   cli(); //disable interupts
   bool tCLK = digitalRead(CLK);
@@ -76,13 +77,24 @@ void ICACHE_RAM_ATTR myISR()
   if(!Triggered && lastTriggerPulse && !tCLK){  //wait for falling edge on CLK pulse 
     TriggerTime = tMillis;
     jsonDoc.clear();
-    Readings = jsonDoc.createNestedArray("Reading");
+    Channel1 = jsonDoc.createNestedArray("Channel1");
+    Channel2 = jsonDoc.createNestedArray("Channel2");
+    Channel2.add(tMillis-TriggerTime);  //start channel2 at the same time
+    Channel2.add(tDT);
     Triggered = true;
   }
-  Readings.add(tMillis-TriggerTime);
-  Readings.add(tCLK);
-  Readings.add(tDT);
+  Channel1.add(tMillis-TriggerTime);
+  Channel1.add(tCLK);
   lastTriggerPulse = tCLK;
+  sei(); //enable interupts
+}
+
+void ICACHE_RAM_ATTR channel2ISR()
+{
+  cli(); //disable interupts
+  if(Triggered) {
+    Channel2.add(millis() - TriggerTime);
+    Channel2.add(digitalRead(DT));}
   sei(); //enable interupts
 }
 
@@ -100,8 +112,9 @@ void setup()
     request->send(LittleFS, "/index.html", "text/html",false); });
   server.serveStatic("/", LittleFS, "/");
   server.begin();
-  attachInterrupt(digitalPinToInterrupt(CLK), myISR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(DT), myISR, CHANGE);
+  delay(2000);
+  attachInterrupt(digitalPinToInterrupt(CLK), channel1ISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(DT), channel2ISR, CHANGE);
 }
 
 void loop()

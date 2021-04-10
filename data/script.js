@@ -46,7 +46,7 @@ function DrawGridlines()
     //draw graph lines
     ctx.beginPath();
     ctx.lineWidth = "1";
-    ctx.strokeStyle = "lightgray";
+    ctx.strokeStyle = "gray";
     //horizontal
     for(gl = gridspacing + gridborder;gl<canvas.height - gridborder ;gl += gridspacing)
     {
@@ -67,46 +67,46 @@ function DrawReadings()
     // draw reading1
     ctx.beginPath();
     ctx.lineWidth = "2";
-    ctx.strokeStyle = "green";
+    ctx.strokeStyle = "cyan";
     
     //startposition
-      ctx.moveTo(jsonReadings["Reading"][0] * yaxisMultiplier + gridborder+1,
-        Reading1YaxisBaseLine - jsonReadings["Reading"][1] * xaxisMultiplier);
+      ctx.moveTo(jsonReadings["Channel1"][0] * yaxisMultiplier + gridborder+1,
+        Reading1YaxisBaseLine - jsonReadings["Channel1"][1] * xaxisMultiplier);
     
-    for(drw=3 ;drw<jsonReadings["Reading"].length; drw+=3)
+    for(drw=2 ;drw<jsonReadings["Channel1"].length; drw+=2)
     {
-        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1,
-            Reading1YaxisBaseLine - jsonReadings["Reading"][drw-2] * xaxisMultiplier);
+        ctx.lineTo(jsonReadings["Channel1"][drw] * yaxisMultiplier + gridborder+1,
+            Reading1YaxisBaseLine - jsonReadings["Channel1"][drw-1] * xaxisMultiplier);
 
-        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1, 
-            Reading1YaxisBaseLine - jsonReadings["Reading"][drw+1] * xaxisMultiplier);   
+        ctx.lineTo(jsonReadings["Channel1"][drw] * yaxisMultiplier + gridborder+1, 
+            Reading1YaxisBaseLine - jsonReadings["Channel1"][drw+1] * xaxisMultiplier);   
     }
     //run to end
     ctx.lineTo(canvas.width - gridborder, 
-            Reading1YaxisBaseLine - jsonReadings["Reading"][drw-2] * xaxisMultiplier);
+            Reading1YaxisBaseLine - jsonReadings["Channel1"][drw-1] * xaxisMultiplier);
 
     ctx.stroke(); // Draw it
 
     // draw reading2
     ctx.beginPath();
     ctx.lineWidth = "2";
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = "yellow";
 
     //startposition
-      ctx.moveTo(jsonReadings["Reading"][0] * yaxisMultiplier + gridborder+1,
-        Reading2YaxisBaseLine - jsonReadings["Reading"][2] * xaxisMultiplier);
+      ctx.moveTo(jsonReadings["Channel2"][0] * yaxisMultiplier + gridborder+1,
+        Reading2YaxisBaseLine - jsonReadings["Channel2"][1] * xaxisMultiplier);
     
-    for(drw=3 ;drw<jsonReadings["Reading"].length; drw+=3)
+    for(drw=2 ;drw<jsonReadings["Channel2"].length; drw+=2)
     {
-        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1,
-            Reading2YaxisBaseLine - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
+        ctx.lineTo(jsonReadings["Channel2"][drw] * yaxisMultiplier + gridborder+1,
+            Reading2YaxisBaseLine - jsonReadings["Channel2"][drw-1] * xaxisMultiplier);
 
-        ctx.lineTo(jsonReadings["Reading"][drw] * yaxisMultiplier + gridborder+1, 
-            Reading2YaxisBaseLine - jsonReadings["Reading"][drw+2] * xaxisMultiplier);   
+        ctx.lineTo(jsonReadings["Channel2"][drw] * yaxisMultiplier + gridborder+1, 
+            Reading2YaxisBaseLine - jsonReadings["Channel2"][drw+1] * xaxisMultiplier);   
     }
     //run to end
     ctx.lineTo(canvas.width - gridborder, 
-            Reading2YaxisBaseLine - jsonReadings["Reading"][drw-1] * xaxisMultiplier);
+            Reading2YaxisBaseLine - jsonReadings["Channel2"][drw-1] * xaxisMultiplier);
 
     ctx.stroke(); // Draw it
 }
@@ -115,6 +115,7 @@ function DrawReadings()
 function DrawLegend(hText,vText) //once only
 {
     ctx.font = "16px Arial";
+    ctx.fillStyle = "white";
     ctx.fillText(hText, (canvas.width - ctx.measureText(hText).width) / 2, canvas.height -5);
     ctx.save();
     ctx.translate( canvas.width - 1, 0 );
