@@ -112,6 +112,7 @@ void setup()
     request->send(LittleFS, "/index.html", "text/html",false); });
   server.serveStatic("/", LittleFS, "/");
   server.begin();
+  delay(2000);
   attachInterrupt(digitalPinToInterrupt(CLK), channel1ISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(DT), channel2ISR, CHANGE);
 }

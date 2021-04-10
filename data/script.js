@@ -46,7 +46,7 @@ function DrawGridlines()
     //draw graph lines
     ctx.beginPath();
     ctx.lineWidth = "1";
-    ctx.strokeStyle = "lightgray";
+    ctx.strokeStyle = "gray";
     //horizontal
     for(gl = gridspacing + gridborder;gl<canvas.height - gridborder ;gl += gridspacing)
     {
@@ -67,7 +67,7 @@ function DrawReadings()
     // draw reading1
     ctx.beginPath();
     ctx.lineWidth = "2";
-    ctx.strokeStyle = "green";
+    ctx.strokeStyle = "cyan";
     
     //startposition
       ctx.moveTo(jsonReadings["Channel1"][0] * yaxisMultiplier + gridborder+1,
@@ -90,7 +90,7 @@ function DrawReadings()
     // draw reading2
     ctx.beginPath();
     ctx.lineWidth = "2";
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = "yellow";
 
     //startposition
       ctx.moveTo(jsonReadings["Channel2"][0] * yaxisMultiplier + gridborder+1,
@@ -115,6 +115,7 @@ function DrawReadings()
 function DrawLegend(hText,vText) //once only
 {
     ctx.font = "16px Arial";
+    ctx.fillStyle = "white";
     ctx.fillText(hText, (canvas.width - ctx.measureText(hText).width) / 2, canvas.height -5);
     ctx.save();
     ctx.translate( canvas.width - 1, 0 );
