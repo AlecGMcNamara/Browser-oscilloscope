@@ -4,7 +4,8 @@ var websocket;
 window.addEventListener('load', onload);
 function onload(event) {
     initWebSocket();
-    DrawLegend("10ms / Div","Digital Signals");
+    
+    DrawLegend(scanLength/10 + "mSec / Div","Digital Signals");
 }
 function initWebSocket() {
     console.log('Trying to open a WebSocket connection…');
@@ -16,6 +17,7 @@ function initWebSocket() {
 function onOpen(event) {
     console.log('Connection opened');
     websocket.send('hi');
+    sendMessage();
 }
 function onClose(event) {
     console.log('Connection closed');
@@ -34,8 +36,8 @@ const gridspacing = 50;
 Reading1YaxisBaseLine = 325;
 Reading2YaxisBaseLine = 175;
 xaxisMultiplier = 100;
-yaxisMultiplier = 5;
-
+scanLength = 250;
+yaxisMultiplier = 500 / scanLength;            //100mS 5, 200mS 2.5, 500ms 1
 var jsonReadings;
 
 //setInterval(DrawGraph,100); //100msec test
@@ -124,4 +126,10 @@ function DrawLegend(hText,vText) //once only
     ctx.restore();
     DrawGridlines();
 }
+function sendMessage() {
+    var jsonSend =  {"scanLength" : scanLength};
+    websocket.send(JSON.stringify(jsonSend));
+    console.log(JSON.stringify(jsonSend));
+}
+
     
