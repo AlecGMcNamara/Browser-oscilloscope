@@ -36,7 +36,7 @@ const gridspacing = 50;
 Reading1YaxisBaseLine = 325;
 Reading2YaxisBaseLine = 175;
 xaxisMultiplier = 100;
-scanLength = 250;
+scanLength = 1000;
 yaxisMultiplier = 500 / scanLength;            //100mS 5, 200mS 2.5, 500ms 1
 var jsonReadings;
 
