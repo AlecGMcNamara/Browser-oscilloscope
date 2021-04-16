@@ -11,7 +11,7 @@
  <h1>Browser Oscilloscope</h1>
  </div>
  <div class="card-grid">
-<div class="card"><p class="card-title">Rotary Encoder</p>
+<div class="card"><p class="card-title">Test Pulses</p>
 <p>
 <canvas id="Axis1Canvas" width="550" height="400" style="border:1px solid #000000; background:black ;" ></canvas>
 </p>
@@ -19,7 +19,7 @@
 
 <div class="card"><p class="card-title">Settings</p>
 <p>
-    <Label class="X Axis Range" id="xaxisrange" >10mSec</label>
+    <label>X-Axis mSec&nbsp;&nbsp;</label><input type="range" id="ScanLengthRange" min="100" max="1000" step="50" onchange="ChangeScanTime()">
 </p>
 </div>    
 </div>

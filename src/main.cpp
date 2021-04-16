@@ -23,10 +23,11 @@ volatile bool lastTriggerPulse = true;
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
-StaticJsonDocument <2000> jsonDoc;
+StaticJsonDocument <10000> jsonSendData;
 JsonArray Channel1;
 JsonArray Channel2; 
 
+int ScanLength = 100; //ms
 // Initialize WiFi
 void initWiFi() {
     WiFi.mode(WIFI_STA);
@@ -41,9 +42,11 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) { 
     data[len] = 0;
-    //myJSONReceived = JSON.parse((char*)data);
+    StaticJsonDocument <200> jsonParameters; 
+    deserializeJson(jsonParameters ,(char*)data);
     //setup IO from message received
-    }
+    ScanLength = jsonParameters["scanLength"] ; 
+  }
 }
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
  void *arg, uint8_t *data, size_t len) {
@@ -76,9 +79,9 @@ void ICACHE_RAM_ATTR channel1ISR()
 
   if(!Triggered && lastTriggerPulse && !tCLK){  //wait for falling edge on CLK pulse 
     TriggerTime = tMillis;
-    jsonDoc.clear();
-    Channel1 = jsonDoc.createNestedArray("Channel1");
-    Channel2 = jsonDoc.createNestedArray("Channel2");
+    jsonSendData.clear();
+    Channel1 = jsonSendData.createNestedArray("Channel1");
+    Channel2 = jsonSendData.createNestedArray("Channel2");
     Channel2.add(tMillis-TriggerTime);  //start channel2 at the same time
     Channel2.add(tDT);
     Triggered = true;
@@ -120,12 +123,12 @@ void setup()
 void loop()
 {
   String strjsonDoc;  
-  if(Triggered && TriggerTime+100 < millis()){
-    serializeJson(jsonDoc, strjsonDoc);
+  if(Triggered && TriggerTime + ScanLength < millis()){
+    serializeJson(jsonSendData, strjsonDoc);
+    Triggered = false;
     if(ws.availableForWriteAll()) 
     {
         ws.textAll(strjsonDoc); 
     }
-    Triggered = false;
-    }  
+   }  
 }
