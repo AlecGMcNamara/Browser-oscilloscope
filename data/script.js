@@ -36,7 +36,7 @@ const gridspacing = 50;
 Reading1YaxisBaseLine = 325;
 Reading2YaxisBaseLine = 175;
 xaxisMultiplier = 100;
-scanLength = 1000;
+scanLength = 500;
 yaxisMultiplier = 500 / scanLength;            //100mS 5, 200mS 2.5, 500ms 1
 var jsonReadings;
 
@@ -130,6 +130,15 @@ function sendMessage() {
     var jsonSend =  {"scanLength" : scanLength};
     websocket.send(JSON.stringify(jsonSend));
     console.log(JSON.stringify(jsonSend));
+}
+function ChangeScanTime()
+{
+    scanLength = ScanLengthRange.value;
+    sendMessage(); //send to ESP8266
+    yaxisMultiplier = 500 / scanLength //change in this program
+    ctx.clearRect(0, 0, canvas.width, canvas.height); //clear X axis ledgend
+    DrawLegend(scanLength/10 + "mSec / Div","Digital Signals");  //redraw
+    DrawGridlines();
 }
 
     
