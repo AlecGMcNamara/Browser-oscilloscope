@@ -31,6 +31,7 @@ int ScanLength = 100; //ms
 // Initialize WiFi
 void initWiFi() {
     WiFi.mode(WIFI_STA);
+    WiFi.hostname("Oscilloscope");
     WiFi.begin(ssid, password);
     Serial.print("Connecting to WiFi ..");
     while (WiFi.status() != WL_CONNECTED) {

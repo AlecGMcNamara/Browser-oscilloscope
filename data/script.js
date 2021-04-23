@@ -139,6 +139,7 @@ function ChangeScanTime()
     ctx.clearRect(0, 0, canvas.width, canvas.height); //clear X axis ledgend
     DrawLegend(scanLength/10 + "mSec / Div","Digital Signals");  //redraw
     DrawGridlines();
+    document.getElementById("lblX-AxisTime").textContent = "X-Axis " + scanLength + " mSec";
 }
 
     
